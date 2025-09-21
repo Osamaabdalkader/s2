@@ -29,13 +29,16 @@ class Router {
             }
         } else {
             // الصفحة غير موجودة، توجيه إلى الصفحة الرئيسية
-            window.location.hash = 'home';
+            this.navigateTo('home');
         }
     }
     
     async loadTemplate(templateId) {
         try {
             const response = await fetch(`pages/${templateId}.html`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
             const html = await response.text();
             
             document.getElementById('app-content').innerHTML = html;
