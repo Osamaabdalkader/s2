@@ -1,3 +1,4 @@
+// تهيئة الصفحة الرئيسية
 function initHomePage() {
     loadPosts();
 }
@@ -17,7 +18,9 @@ async function loadPosts() {
             
             if (debugMode) {
                 const debugEl = document.getElementById('debug-info');
-                debugEl.innerHTML += `<p>خطأ في تحميل المنشورات: ${error.message}</p>`;
+                if (debugEl) {
+                    debugEl.innerHTML += `<p>خطأ في تحميل المنشورات: ${error.message}</p>`;
+                }
             }
             return;
         }
@@ -30,7 +33,9 @@ async function loadPosts() {
         
         if (debugMode) {
             const debugEl = document.getElementById('debug-info');
-            debugEl.innerHTML += `<p>خطأ في تحميل المنشورات: ${error.message}</p>`;
+            if (debugEl) {
+                debugEl.innerHTML += `<p>خطأ في تحميل المنشورات: ${error.message}</p>`;
+            }
         }
     }
 }
@@ -38,6 +43,8 @@ async function loadPosts() {
 // عرض المنشورات في الصفحة الرئيسية
 function displayPosts(posts) {
     const postsContainer = document.getElementById('posts-container');
+    if (!postsContainer) return;
+    
     postsContainer.innerHTML = '';
     
     if (!posts || posts.length === 0) {
