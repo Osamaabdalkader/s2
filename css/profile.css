@@ -1,0 +1,28 @@
+.profile-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.profile-info {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.profile-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+}
+
+.profile-label i {
+    margin-left: 10px;
+    color: var(--secondary-color);
+}
