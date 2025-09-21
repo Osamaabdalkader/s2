@@ -2,11 +2,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('تم تحميل التطبيق');
     
-    // تحميل الأجزاء الثابتة (الهيدر والفوتر)
-    await loadPartials();
-    
     // إعداد نظام التوجيه
     setupRouter();
+    
+    // إعداد أحداث واجهة المستخدم
+    setupUIEvents();
     
     // اختبار اتصال Supabase
     await testConnection();
@@ -18,102 +18,94 @@ document.addEventListener('DOMContentLoaded', async () => {
     handleInitialRoute();
 });
 
-// تحميل الأجزاء الثابتة
-async function loadPartials() {
-    try {
-        // تحميل الهيدر
-        const headerResponse = await fetch('partials/header.html');
-        const headerHtml = await headerResponse.text();
-        document.getElementById('header-container').innerHTML = headerHtml;
-        
-        // تحميل الفوتر
-        const footerResponse = await fetch('partials/footer.html');
-        const footerHtml = await footerResponse.text();
-        document.getElementById('footer-container').innerHTML = footerHtml;
-        
-        // إعداد أحداث الهيدر بعد تحميله
-        setupHeaderEvents();
-    } catch (error) {
-        console.error('خطأ في تحميل الأجزاء:', error);
-    }
-}
-
-// إعداد أحداث الهيدر
-function setupHeaderEvents() {
-    // الانتقال بين الصفحات
-    document.querySelectorAll('[data-nav]').forEach(link => {
-        link.addEventListener('click', function(e) {
+// إعداد نظام التوجيه
+function setupRouter() {
+    // منع السلوك الافتراضي للروابط ذات data-link
+    document.body.addEventListener('click', e => {
+        if (e.target.matches('[data-link]')) {
             e.preventDefault();
-            const page = this.getAttribute('data-nav');
+            const href = e.target.getAttribute('href');
+            const page = href.substring(1); // إزالة #
             navigateTo(page);
-        });
+        }
     });
     
-    // تسجيل الخروج
-    const logoutBtn = document.getElementById('logout-link');
+    // التعامل مع تغيير الـ hash في المتصفح
+    window.addEventListener('hashchange', () => {
+        const page = window.location.hash.substring(1) || 'home';
+        loadPage(page);
+    });
+}
+
+// إعداد أحداث واجهة المستخدم
+function setupUIEvents() {
+    // إعداد حدث تسجيل الخروج
+    const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
+        logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             logout();
         });
     }
     
-    // تصحيح الأخطاء
-    const debugBtn = document.getElementById('debug-link');
+    // إعداد حدث تصحيح الأخطاء
+    const debugBtn = document.getElementById('debug-btn');
     if (debugBtn) {
-        debugBtn.addEventListener('click', function(e) {
+        debugBtn.addEventListener('click', (e) => {
             e.preventDefault();
             toggleDebug();
         });
     }
 }
 
-// إعداد نظام التوجيه
-function setupRouter() {
-    // تعريف المسارات
-    window.routes = {
-        'home': { template: 'pages/home.html', script: 'js/home.js', init: initHomePage },
-        'publish': { template: 'pages/publish.html', script: 'js/publish.js', init: initPublishPage },
-        'login': { template: 'pages/login.html', script: 'js/login.js', init: initLoginPage },
-        'register': { template: 'pages/register.html', script: 'js/register.js', init: initRegisterPage },
-        'profile': { template: 'pages/profile.html', script: 'js/profile.js', init: initProfilePage }
-    };
-    
-    // الاستماع لتغيرات الـ hash في URL
-    window.addEventListener('hashchange', handleRoute);
-}
-
 // معالجة المسار الأولي
 function handleInitialRoute() {
-    const hash = window.location.hash.substring(1);
-    if (hash) {
-        navigateTo(hash);
-    } else {
-        navigateTo('home');
-    }
+    // استخدام الـ hash الحالي أو الصفحة الرئيسية
+    const page = window.location.hash.substring(1) || 'home';
+    navigateTo(page);
 }
 
 // التنقل إلى صفحة
-async function navigateTo(page) {
-    if (!window.routes[page]) {
-        console.error('الصفحة غير موجودة:', page);
-        return;
+function navigateTo(page) {
+    if (!routes[page]) {
+        page = 'home';
     }
     
     // تحديث الـ URL
     window.location.hash = page;
     
     // تحميل الصفحة
-    await loadPage(page);
+    loadPage(page);
 }
 
 // تحميل الصفحة
 async function loadPage(page) {
-    const route = window.routes[page];
+    if (!routes[page]) {
+        page = 'home';
+    }
+    
+    const route = routes[page];
+    
+    // التحقق من المصادقة إذا كانت الصفحة تتطلب ذلك
+    if (route.auth && !currentUser) {
+        navigateTo('login');
+        return;
+    }
     
     try {
+        // عرض حالة التحميل
+        document.getElementById('app-content').innerHTML = `
+            <div class="loader">
+                <div class="spinner"></div>
+            </div>
+        `;
+        
         // تحميل القالب
         const response = await fetch(route.template);
+        if (!response.ok) {
+            throw new Error('لم يتم العثور على الصفحة');
+        }
+        
         const html = await response.text();
         document.getElementById('app-content').innerHTML = html;
         
@@ -130,6 +122,7 @@ async function loadPage(page) {
             <div class="error-page">
                 <h2>خطأ في تحميل الصفحة</h2>
                 <p>تعذر تحميل الصفحة المطلوبة. يرجى المحاولة مرة أخرى.</p>
+                <button onclick="navigateTo('home')">العودة إلى الرئيسية</button>
             </div>
         `;
     }
@@ -187,4 +180,4 @@ function loadDebugInfo() {
             <p>معلومات المتصفح: ${navigator.userAgent}</p>
         `;
     }
-                              }
+                }
