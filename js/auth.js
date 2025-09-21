@@ -69,3 +69,33 @@ supabase.auth.onAuthStateChange((event, session) => {
         updateUIForAuth();
     }
 });
+
+
+       // إدارة المسارات
+function handleRoute() {
+    const hash = window.location.hash.substring(1) || 'home';
+    navigateTo(hash);
+}
+
+// تحديث واجهة المستخدم بناءً على حالة تسجيل الدخول
+function updateUIForAuth() {
+    const publishLink = document.getElementById('publish-link');
+    const profileLink = document.getElementById('profile-link');
+    const logoutLink = document.getElementById('logout-link');
+    const loginLink = document.getElementById('login-link');
+    const registerLink = document.getElementById('register-link');
+    
+    if (currentUser) {
+        if (publishLink) publishLink.style.display = 'list-item';
+        if (profileLink) profileLink.style.display = 'list-item';
+        if (logoutLink) logoutLink.style.display = 'list-item';
+        if (loginLink) loginLink.style.display = 'none';
+        if (registerLink) registerLink.style.display = 'none';
+    } else {
+        if (publishLink) publishLink.style.display = 'none';
+        if (profileLink) profileLink.style.display = 'none';
+        if (logoutLink) logoutLink.style.display = 'none';
+        if (loginLink) loginLink.style.display = 'list-item';
+        if (registerLink) registerLink.style.display = 'list-item';
+    }
+}
