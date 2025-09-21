@@ -16,11 +16,6 @@ async function testConnection() {
             console.error('اتصال Supabase فشل:', error);
             connectionStatus.textContent = `خطأ في الاتصال: ${error.message}`;
             connectionStatus.className = 'connection-status connection-error';
-            
-            if (debugMode) {
-                const debugEl = document.getElementById('debug-info');
-                debugEl.innerHTML += `<p>خطأ الاتصال: ${error.message}</p>`;
-            }
         } else {
             console.log('اتصال Supabase ناجح');
             connectionStatus.textContent = 'الاتصال مع قاعدة البيانات ناجح';
@@ -36,4 +31,4 @@ async function testConnection() {
         connectionStatus.textContent = `خطأ في الاتصال: ${error.message}`;
         connectionStatus.className = 'connection-status connection-error';
     }
-}
+                    }
