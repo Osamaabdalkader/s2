@@ -1,0 +1,24 @@
+<header>
+    <div class="container">
+        <nav>
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                منصة تسريع الإلكترونية
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" data-nav="home"><i class="fas fa-home"></i> الرئيسية</a></li>
+                <li id="publish-link" style="display: none;"><a href="#" data-nav="publish"><i class="fas fa-plus-circle"></i> نشر منشور</a></li>
+                <li id="profile-link" style="display: none;"><a href="#" data-nav="profile"><i class="fas fa-user"></i> حسابي</a></li>
+                <li id="login-link"><a href="#" data-nav="login"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a></li>
+                <li id="register-link"><a href="#" data-nav="register"><i class="fas fa-user-plus"></i> إنشاء حساب</a></li>
+                <li id="logout-link" style="display: none;"><a href="#"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
+                <li id="debug-link"><a href="#"><i class="fas fa-bug"></i> تصحيح الأخطاء</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<script>
+    // إعلام التطبيق بأن الهيدر قد تم تحميله
+    document.dispatchEvent(new Event('headerLoaded'));
+</script>
