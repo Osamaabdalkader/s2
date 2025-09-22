@@ -24,8 +24,14 @@ function setupRouter() {
     document.body.addEventListener('click', e => {
         if (e.target.matches('[data-link]')) {
             e.preventDefault();
-            const href = e.target.getAttribute('href');
-            const page = href.substring(1); // إزالة #
+            const page = e.target.getAttribute('data-link');
+            navigateTo(page);
+        }
+        
+        // معالجة الأزرار ذات data-link
+        if (e.target.matches('button[data-link]')) {
+            e.preventDefault();
+            const page = e.target.getAttribute('data-link');
             navigateTo(page);
         }
     });
@@ -33,7 +39,7 @@ function setupRouter() {
     // التعامل مع تغيير الـ hash في المتصفح
     window.addEventListener('hashchange', () => {
         const page = window.location.hash.substring(1) || 'home';
-        loadPage(page);
+        showPage(page);
     });
 }
 
@@ -56,6 +62,30 @@ function setupUIEvents() {
             toggleDebug();
         });
     }
+    
+    // إعداد أحداث النماذج
+    setupFormEvents();
+}
+
+// إعداد أحداث النماذج
+function setupFormEvents() {
+    // نموذج النشر
+    const publishForm = document.getElementById('publish-form');
+    if (publishForm) {
+        publishForm.addEventListener('submit', handlePublishSubmit);
+    }
+    
+    // نموذج تسجيل الدخول
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLoginSubmit);
+    }
+    
+    // نموذج إنشاء حساب
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleRegisterSubmit);
+    }
 }
 
 // معالجة المسار الأولي
@@ -67,84 +97,73 @@ function handleInitialRoute() {
 
 // التنقل إلى صفحة
 function navigateTo(page) {
-    if (!routes[page]) {
+    if (!isValidPage(page)) {
         page = 'home';
     }
     
     // تحديث الـ URL
     window.location.hash = page;
     
-    // تحميل الصفحة
-    loadPage(page);
+    // عرض الصفحة
+    showPage(page);
 }
 
-// تحميل الصفحة
-async function loadPage(page) {
-    if (!routes[page]) {
+// التحقق إذا كانت الصفحة صالحة
+function isValidPage(page) {
+    const validPages = ['home', 'publish', 'login', 'register', 'profile'];
+    return validPages.includes(page);
+}
+
+// عرض الصفحة
+function showPage(page) {
+    if (!isValidPage(page)) {
         page = 'home';
     }
     
-    const route = routes[page];
+    // إخفاء جميع الصفحات
+    document.querySelectorAll('.page').forEach(pageEl => {
+        pageEl.classList.remove('active');
+    });
     
-    // التحقق من المصادقة إذا كانت الصفحة تتطلب ذلك
-    if (route.auth && !currentUser) {
-        navigateTo('login');
-        return;
-    }
-    
-    try {
-        // عرض حالة التحميل
-        document.getElementById('app-content').innerHTML = `
-            <div class="loader">
-                <div class="spinner"></div>
-            </div>
-        `;
+    // إظهار الصفحة المطلوبة
+    const pageEl = document.getElementById(`${page}-page`);
+    if (pageEl) {
+        pageEl.classList.add('active');
         
-        // تحميل القالب
-        const response = await fetch(route.template);
-        if (!response.ok) {
-            throw new Error('لم يتم العثور على الصفحة');
-        }
-        
-        const html = await response.text();
-        document.getElementById('app-content').innerHTML = html;
-        
-        // تحميل script الصفحة
-        await loadScript(route.script);
-        
-        // استدعاء دالة التهيئة
-        if (typeof route.init === 'function') {
-            route.init();
-        }
-    } catch (error) {
-        console.error('خطأ في تحميل الصفحة:', error);
-        document.getElementById('app-content').innerHTML = `
-            <div class="error-page">
-                <h2>خطأ في تحميل الصفحة</h2>
-                <p>تعذر تحميل الصفحة المطلوبة. يرجى المحاولة مرة أخرى.</p>
-                <button onclick="navigateTo('home')">العودة إلى الرئيسية</button>
-            </div>
-        `;
+        // تحميل المحتوى الديناميكي للصفحة
+        loadPageContent(page);
     }
 }
 
-// تحميل script
-function loadScript(src) {
-    return new Promise((resolve, reject) => {
-        // إزالة أي scripts سابقة
-        const oldScript = document.getElementById('page-script');
-        if (oldScript) {
-            oldScript.remove();
-        }
-        
-        // إنشاء script جديد
-        const script = document.createElement('script');
-        script.id = 'page-script';
-        script.src = src;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.body.appendChild(script);
-    });
+// تحميل محتوى الصفحة
+function loadPageContent(page) {
+    switch(page) {
+        case 'home':
+            if (typeof loadPosts === 'function') {
+                loadPosts();
+            }
+            break;
+        case 'publish':
+            if (typeof initPublishPage === 'function') {
+                initPublishPage();
+            }
+            break;
+        case 'login':
+            if (typeof initLoginPage === 'function') {
+                initLoginPage();
+            }
+            break;
+        case 'register':
+            if (typeof initRegisterPage === 'function') {
+                initRegisterPage();
+            }
+            break;
+        case 'profile':
+            if (typeof initProfilePage === 'function') {
+                initProfilePage();
+            }
+            break;
+    }
 }
 
 // وظائف مساعدة
@@ -180,4 +199,4 @@ function loadDebugInfo() {
             <p>معلومات المتصفح: ${navigator.userAgent}</p>
         `;
     }
-                }
+}
