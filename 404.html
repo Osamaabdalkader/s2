@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>إعادة توجيه - منصة تسريع الإلكترونية</title>
+    <script>
+        // إعادة التوجيه إلى الصفحة الرئيسية مع الحفاظ على المسار
+        sessionStorage.redirect = location.pathname;
+        location.replace('/' + location.pathname.split('/')[1] + '/');
+    </script>
+</head>
+<body>
+    <p>جاري التوجيه إلى الصفحة الرئيسية...</p>
+</body>
+</html>
