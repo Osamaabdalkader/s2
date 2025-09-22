@@ -1,8 +1,9 @@
+// تهيئة صفحة تسجيل الدخول
 function initLoginPage() {
-    // إعداد نموذج تسجيل الدخول
-    document.getElementById('login-form').addEventListener('submit', handleLoginSubmit);
+    // لا حاجة لعمل أي شيء هنا حيث تم إعداد الأحداث في app.js
 }
 
+// معالجة إرسال نموذج تسجيل الدخول
 async function handleLoginSubmit(e) {
     e.preventDefault();
     
@@ -19,7 +20,7 @@ async function handleLoginSubmit(e) {
         
         currentUser = data.user;
         updateUIForAuth();
-        router.navigateTo('home');
+        navigateTo('home');
     } catch (error) {
         console.error('Error signing in:', error.message);
         showStatus(`فشل تسجيل الدخول: ${error.message}`, 'error', 'login-status');
