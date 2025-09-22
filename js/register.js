@@ -1,8 +1,9 @@
+// تهيئة صفحة إنشاء حساب
 function initRegisterPage() {
-    // إعداد نموذج إنشاء حساب
-    document.getElementById('register-form').addEventListener('submit', handleRegisterSubmit);
+    // لا حاجة لعمل أي شيء هنا حيث تم إعداد الأحداث في app.js
 }
 
+// معالجة إرسال نموذج إنشاء حساب
 async function handleRegisterSubmit(e) {
     e.preventDefault();
     
@@ -41,7 +42,7 @@ async function handleRegisterSubmit(e) {
         
         // الانتظار قليلاً ثم الانتقال إلى صفحة تسجيل الدخول
         setTimeout(() => {
-            router.navigateTo('login');
+            navigateTo('login');
         }, 2000);
     } catch (error) {
         console.error('Error signing up:', error.message);
