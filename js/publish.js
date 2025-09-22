@@ -1,3 +1,4 @@
+// تهيئة صفحة النشر
 function initPublishPage() {
     // التحقق من حالة تسجيل الدخول
     if (!currentUser) {
@@ -6,18 +7,16 @@ function initPublishPage() {
     } else {
         document.getElementById('publish-content').style.display = 'block';
         document.getElementById('login-required-publish').style.display = 'none';
-        
-        // إعداد نموذج النشر
-        document.getElementById('publish-form').addEventListener('submit', handlePublishSubmit);
     }
 }
 
+// معالجة إرسال نموذج النشر
 async function handlePublishSubmit(e) {
     e.preventDefault();
     
     if (!currentUser) {
         showStatus('يجب تسجيل الدخول لنشر منشور', 'error');
-        router.navigateTo('login');
+        navigateTo('login');
         return;
     }
     
@@ -64,9 +63,12 @@ async function handlePublishSubmit(e) {
                 
                 // الانتظار قليلاً ثم العودة إلى الصفحة الرئيسية
                 setTimeout(() => {
-                    document.getElementById('upload-status').classList.remove('success');
-                    document.getElementById('upload-status').style.display = 'none';
-                    router.navigateTo('home');
+                    const uploadStatus = document.getElementById('upload-status');
+                    if (uploadStatus) {
+                        uploadStatus.classList.remove('success');
+                        uploadStatus.style.display = 'none';
+                    }
+                    navigateTo('home');
                 }, 1500);
             } else {
                 showStatus('فشل في نشر المنشور', 'error');
@@ -80,7 +82,9 @@ async function handlePublishSubmit(e) {
         
         if (debugMode) {
             const debugEl = document.getElementById('debug-info');
-            debugEl.innerHTML += `<p>خطأ: ${error.message}</p>`;
+            if (debugEl) {
+                debugEl.innerHTML += `<p>خطأ: ${error.message}</p>`;
+            }
         }
     }
 }
@@ -102,7 +106,9 @@ async function uploadImage(file) {
             console.error('Error uploading image:', uploadError);
             if (debugMode) {
                 const debugEl = document.getElementById('debug-info');
-                debugEl.innerHTML += `<p>خطأ في رفع الصورة: ${uploadError.message}</p>`;
+                if (debugEl) {
+                    debugEl.innerHTML += `<p>خطأ في رفع الصورة: ${uploadError.message}</p>`;
+                }
             }
             throw new Error(uploadError.message);
         }
@@ -117,7 +123,9 @@ async function uploadImage(file) {
         console.error('Error:', error);
         if (debugMode) {
             const debugEl = document.getElementById('debug-info');
-            debugEl.innerHTML += `<p>خطأ في رفع الصورة: ${error.message}</p>`;
+            if (debugEl) {
+                debugEl.innerHTML += `<p>خطأ في رفع الصورة: ${error.message}</p>`;
+            }
         }
         throw error;
     }
@@ -142,22 +150,22 @@ async function addPost(name, description, location, category, price, imageUrl) {
             console.error('Error adding post:', error);
             if (debugMode) {
                 const debugEl = document.getElementById('debug-info');
-                debugEl.innerHTML += `<p>خطأ في إضافة المنشور: ${error.message}</p>`;
+                if (debugEl) {
+                    debugEl.innerHTML += `<p>خطأ في إضافة المنشور: ${error.message}</p>`;
+                }
             }
             throw new Error(error.message);
         }
         
-        // إعادة تحميل المنشورات بعد الإضافة
-        if (typeof loadPosts === 'function') {
-            loadPosts();
-        }
         return true;
     } catch (error) {
         console.error('Error:', error);
         if (debugMode) {
             const debugEl = document.getElementById('debug-info');
-            debugEl.innerHTML += `<p>خطأ في إضافة المنشور: ${error.message}</p>`;
+            if (debugEl) {
+                debugEl.innerHTML += `<p>خطأ في إضافة المنشور: ${error.message}</p>`;
+            }
         }
         throw error;
     }
-}
+        }
